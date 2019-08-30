@@ -1,9 +1,7 @@
 # 简介
----
 ant-design-vue-admin是基于ant-design-vue及ant-design-vue=pro的后台管理系统前端解决方案。使用了最新的vue全家桶，内置了动态路由，权限验证，全局loading，全局错误处理，集合了常用组件，是一套中后台解决方案的集合，适合快速开发早期项目。
 
 ## 前序准备
----
 你需要在本地安装 node 和 git。本项目技术栈基于 ES2015+、vue、vuex、vue-router 、vue-cli 、axios 和 ant-design-vue，后台使用eggjs+mongodb搭建。
 ## 目录结构
 ```javascript
