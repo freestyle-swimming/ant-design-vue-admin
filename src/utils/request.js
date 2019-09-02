@@ -15,6 +15,8 @@ import {
   notFoundStatuMessage,
   unauthorizedStatuCode,
   unauthorizedStatuMessage,
+  serverErrorStatuMessage,
+  serverErrorStatuCode,
 } from '@/constants/config';
 // 创建 axios 实例
 const axiosInstance = axios.create({
@@ -88,6 +90,10 @@ const responseErrorHandle = (error) => {
   if (status === unauthorizedStatuCode) {
     modal.error(unauthorizedStatuMessage);
     // 跳转到登录页面 todo
+  }
+  // 500 处理
+  if (status === serverErrorStatuCode) {
+    modal.error(serverErrorStatuMessage);
   }
   // 错误抛出统一收集处理
   return Promise.reject(error);
