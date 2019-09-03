@@ -1,8 +1,9 @@
 import axios from 'axios';
 import Vue from 'vue';
 import {
-  modal,
+  Modal,
   notification,
+  message,
 } from 'ant-design-vue';
 import store from '@/store/index';
 import { ACCESS_TOKEN } from '@/constants/types';
@@ -18,6 +19,7 @@ import {
   serverErrorStatuMessage,
   serverErrorStatuCode,
 } from '@/constants/config';
+
 // 创建 axios 实例
 const axiosInstance = axios.create({
   baseURL: process.env.VUE_APP_API,
@@ -28,10 +30,8 @@ window.addEventListener('unhandledrejection', (evt) => {
   evt.promise.catch((error) => {
     // 错误先重置loading
     store.commit('RESET_VUEX_LOADING');
-    notification.error({
-      message: 'Error',
-      description: error.data || error.data[responsMessageKey] || error.data[responsErrorKey],
-    });
+    // todo 全局promise错误处理
+    console.error(error);
   });
 });
 
@@ -57,22 +57,22 @@ const responseInterceptorHandler = (response) => {
   if (code === responseSuccessCodeValue) {
     return response.data;
   }
-  const message = response.data[responsMessageKey];
+  const resmessage = response.data[responsMessageKey];
   const errors = response.data[responsErrorKey];
   // 业务异常处理
   switch (code) {
     case 422:
       // 处理422异常
       notification.error({
-        message,
+        message: resmessage,
         description: errors,
       });
       break;
     case 9001:
-      modal.error(message);
+      message.error(message);
       break;
     default:
-      modal.error(message);
+      message.error(message);
   }
   // 错误抛停止代码运行
   return Promise.reject(response);
@@ -84,16 +84,22 @@ const responseErrorHandle = (error) => {
   const { status } = error.response;
   // 404 处理
   if (status === notFoundStatuCode) {
-    modal.error(notFoundStatuMessage);
+    Modal.error({
+      title: '404',
+      content: notFoundStatuMessage,
+    });
   }
   // 401 处理
   if (status === unauthorizedStatuCode) {
-    modal.error(unauthorizedStatuMessage);
+    Modal.error({
+      title: '登录过期',
+      content: unauthorizedStatuMessage,
+    });
     // 跳转到登录页面 todo
   }
   // 500 处理
   if (status === serverErrorStatuCode) {
-    modal.error(serverErrorStatuMessage);
+    Modal.error({ title: '服务器错误', content: serverErrorStatuMessage });
   }
   // 错误抛出统一收集处理
   return Promise.reject(error);
