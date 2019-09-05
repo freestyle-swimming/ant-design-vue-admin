@@ -10,12 +10,16 @@ export const responsErrorKey = 'errors';
 export const notFoundStatuCode = 404;
 // unauthorized statu code
 export const unauthorizedStatuCode = 401;
+// 403 未登录
+export const unloginStatuCode = 403;
 // 500 statu code
 export const serverErrorStatuCode = 500;
 // 404 提示文案
 export const notFoundStatuMessage = '您请求的接口未找到！';
 // 401 提示文案
 export const unauthorizedStatuMessage = '登录信息过期请重新登录！';
+// 403 文案
+export const unloginStatuCodeMessage = '未登录,请登重新登录';
 // 500 提示文案
 export const serverErrorStatuMessage = '服务器错误请稍后再试！';
 // vue ls option

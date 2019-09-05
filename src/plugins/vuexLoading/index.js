@@ -1,3 +1,4 @@
+/* eslint-disable no-const-assign */
 const moduleName = 'loading';
 const SHOW_VUEX_LOADING = 'SHOW_VUEX_LOADING';
 const HIDE_VUEX_LOADING = 'HIDE_VUEX_LOADING';
@@ -15,17 +16,20 @@ const vuexLoadingStore = {
       };
     },
     [RESET_VUEX_LOADING]: (state) => {
-      const actions = Object.keys(state.actions);
-      for (let i = 0; i < actions.length; i += 1) {
-        const item = state[actions[i]];
-        if (item) {
-          state.actions = {
-            ...state.actions,
-            [item]: false,
-          };
-          break;
+      // eslint-disable-next-line no-restricted-syntax
+      const actions = Object.assign(state.actions);
+      const keys = Object.keys(actions);
+      const loading = {};
+      for (let i = 0; i < keys.length; i += 1) {
+        const key = keys[i];
+        if (actions[key]) {
+          loading[key] = false;
         }
       }
+      state.actions = {
+        ...state.actions,
+        ...loading,
+      };
     },
     [HIDE_VUEX_LOADING]: (state, payload) => {
       state.actions = {

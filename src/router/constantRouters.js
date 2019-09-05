@@ -1,5 +1,14 @@
 export default [
   {
+    path: '/user',
+    component: () => import('@/layouts/UserLayout.vue'),
+    children: [{
+      path: 'login',
+      name: 'login',
+      component: () => import('@/views/user/login.vue'),
+    }],
+  },
+  {
     path: '/',
     name: 'home',
     component: () => import(/* webpackChunkName: "about" */ '@/views/Home.vue'),

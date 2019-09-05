@@ -5,7 +5,9 @@ import {
   notification,
   message,
 } from 'ant-design-vue';
+// eslint-disable-next-line import/no-cycle
 import store from '@/store/index';
+import router from '@/router/router';
 import { ACCESS_TOKEN } from '@/constants/types';
 import {
   responseCodeKey,
@@ -18,6 +20,8 @@ import {
   unauthorizedStatuMessage,
   serverErrorStatuMessage,
   serverErrorStatuCode,
+  unloginStatuCode,
+  unloginStatuCodeMessage,
 } from '@/constants/config';
 
 // 创建 axios 实例
@@ -31,14 +35,17 @@ window.addEventListener('unhandledrejection', (evt) => {
     // 错误先重置loading
     store.commit('RESET_VUEX_LOADING');
     // todo 全局promise错误处理
-    console.error(error);
+    console.log(error);
   });
 });
-
+const notLoginOkHandler = () => {
+  router.push({ name: 'login' });
+};
 // 请求拦截处理
 const requestInterceptorHandler = (config) => {
   // 获取token
   const token = Vue.ls.get(ACCESS_TOKEN);
+  console.log(token);
   const obj = Object.assign(config, {});
   if (token) {
     obj.headers.Authorization = `Bearer ${token}`;
@@ -68,11 +75,19 @@ const responseInterceptorHandler = (response) => {
         description: errors,
       });
       break;
+    case unloginStatuCode:
+      Modal.error({
+        title: '未登录',
+        content: unloginStatuCodeMessage,
+        onOk: notLoginOkHandler,
+      });
+      break;
     case 9001:
-      message.error(message);
+      message.error(resmessage);
       break;
     default:
-      message.error(message);
+      store.commit('RESET_VUEX_LOADING');
+      message.error(resmessage);
   }
   // 错误抛停止代码运行
   return Promise.reject(response);
@@ -81,30 +96,43 @@ const responseInterceptorHandler = (response) => {
 const requestErrorHandle = error => Promise.reject(error);
 // 响应错误处理
 const responseErrorHandle = (error) => {
-  const { status } = error.response;
-  // 404 处理
-  if (status === notFoundStatuCode) {
+  store.commit('RESET_VUEX_LOADING');
+  if (error.response) {
+    const {
+      status,
+    } = error.response;
+    // 404 处理
+    if (status === notFoundStatuCode) {
+      Modal.error({
+        title: '404',
+        content: notFoundStatuMessage,
+      });
+    }
+    // 401 处理
+    if (status === unauthorizedStatuCode) {
+      Modal.error({
+        title: '登录过期',
+        content: unauthorizedStatuMessage,
+      });
+      // 跳转到登录页面 todo
+    }
+    // 500 处理
+    if (status === serverErrorStatuCode) {
+      Modal.error({
+        title: '服务器错误',
+        content: serverErrorStatuMessage,
+      });
+    }
+  } else {
+    // 网络错误
     Modal.error({
-      title: '404',
-      content: notFoundStatuMessage,
+      title: '请检查网络',
+      content: error.message,
     });
-  }
-  // 401 处理
-  if (status === unauthorizedStatuCode) {
-    Modal.error({
-      title: '登录过期',
-      content: unauthorizedStatuMessage,
-    });
-    // 跳转到登录页面 todo
-  }
-  // 500 处理
-  if (status === serverErrorStatuCode) {
-    Modal.error({ title: '服务器错误', content: serverErrorStatuMessage });
   }
   // 错误抛出统一收集处理
   return Promise.reject(error);
 };
-
 // 请求拦截器
 axiosInstance.interceptors.request.use(requestInterceptorHandler, requestErrorHandle);
 // 响应拦截器

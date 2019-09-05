@@ -1,13 +1,25 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
+    <router-view />
   </div>
 </template>
-
+<script>
+import { mapActions } from 'vuex';
+export default {
+  mounted() {
+    this.initData();
+  },
+  methods:{
+    ...mapActions(['getUserBaseInfo']),
+    async initData(){
+      const whitePathNames = ['/user/login'];
+      const pathname = window.location.pathname;
+      if(whitePathNames.includes(pathname)) return;
+      this.getUserBaseInfo();
+    }
+  },
+}
+</script>
 <style lang="less">
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;

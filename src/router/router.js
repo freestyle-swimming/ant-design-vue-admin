@@ -5,5 +5,6 @@ import constantRouters from '@/router/constantRouters';
 Vue.use(Router);
 
 export default new Router({
+  mode: 'history',
   routes: constantRouters,
 });
